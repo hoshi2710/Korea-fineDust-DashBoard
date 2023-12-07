@@ -1,0 +1,207 @@
+@font-face {
+  font-family: "StrongArmy"; /* 사용하려는 글꼴의 이름을 지정합니다 */
+  src: url("strongArmy.woff2") format("woff"); /* 글꼴 파일의 경로와 형식을 지정합니다 */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-family: "StrongArmy", sans-serif;
+  user-select: none;
+}
+i {
+  text-decoration: none;
+}
+.background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(-30deg, #656565, #212121);
+  --color-pulse: 1;
+  --before-opacity: 0;
+  --before-transition: opacity 0.5s;
+  --airQuality1-Gradient: linear-gradient(
+    -30deg,
+    rgba(91, 84, 207, var(--color-pulse)),
+    rgba(0, 212, 255, var(--color-pulse))
+  ) !important;
+  --airQuality2-Gradient: linear-gradient(
+    -30deg,
+    rgba(67, 131, 63, var(--color-pulse)),
+    rgba(71, 254, 67, var(--color-pulse))
+  ) !important;
+  --airQuality3-Gradient: linear-gradient(
+    -30deg,
+    rgba(131, 124, 63, var(--color-pulse)),
+    rgba(254, 236, 67, var(--color-pulse))
+  ) !important;
+  --airQuality4-Gradient: linear-gradient(
+    -30deg,
+    rgba(131, 63, 63, var(--color-pulse)),
+    rgba(254, 67, 67, var(--color-pulse))
+  ) !important;
+  --before-background: linear-gradient(-30deg, #656565, #212121);
+}
+.background::before {
+  position: absolute;
+  transition: var(--before-transition);
+  width: 100%;
+  height: 100%;
+  content: " ";
+  opacity: var(--before-opacity);
+  background: var(--before-background);
+}
+.airQuality1 {
+  background: var(--airQuality1-Gradient);
+}
+.airQuality2 {
+  background: var(--airQuality2-Gradient);
+}
+.airQuality3 {
+  background: var(--airQuality3-Gradient);
+}
+.airQuality4 {
+  background: var(--airQuality4-Gradient);
+}
+.search {
+  position: relative;
+  width: 100%;
+  height: 5%;
+  padding-left: 25%;
+  padding-right: 25%;
+}
+.search > .searchOutline {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin-top: 1%;
+  border-radius: 30px;
+  background-color: transparent;
+  border: 3px solid #000;
+  /* padding-left: 50px; */
+}
+.search > .searchOutline > * {
+  display: inline-block;
+}
+.search span {
+  height: 100%;
+  width: 5%;
+  text-align: center;
+  font-weight: 600;
+  padding-top: 8px;
+  padding-left: 10px;
+}
+.search input {
+  outline: none;
+  position: relative;
+  background-color: transparent;
+  top: -6px;
+  padding-left: 10px;
+  width: 80%;
+  height: 100%;
+  color: #000;
+  font-size: 12pt;
+  border: none;
+}
+.search input:focus {
+  --placeholder-color: transparent;
+}
+.search input::placeholder {
+  color: var(--placeholder-color);
+  font-weight: 600;
+  display: block;
+  font-size: 12pt;
+  padding-top: 3px;
+}
+.contents .location {
+  font-size: 30pt;
+}
+.contents .status {
+  font-weight: 400;
+  font-size: 250pt;
+}
+.location {
+  margin-bottom: 10px;
+}
+.location > * {
+  display: inline-block;
+}
+.location > span {
+  font-size: 22.5pt;
+}
+.contents {
+  position: absolute;
+  left: 3%;
+  bottom: 8%;
+}
+.dustValue {
+  margin-bottom: 30px;
+  margin-left: 40px;
+}
+.dustTypeOutline {
+  border: 3px solid #000;
+  border-radius: 30px;
+  right: 50px;
+  bottom: 50px;
+  position: absolute;
+  width: 50px;
+  height: 200px;
+}
+.dustType {
+  position: absolute;
+  left: -2px;
+  width: 50px;
+  filter: invert();
+  isolation: isolate;
+}
+.dustType > * {
+  mix-blend-mode: difference;
+  margin-left: -2.2px;
+}
+
+.dustTypeButtons {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  background-position: 3px -1px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin: -1px;
+}
+.dustTypeButtons:hover {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: 0.2s;
+}
+
+.dustTypeSelector {
+  box-sizing: content-box;
+  position: absolute;
+  left: 1px;
+  top: -3px;
+  margin-top: -1px;
+  width: 50px;
+  height: 53px;
+  background-color: rgba(255, 255, 255);
+  /* border: 1px solid #fff; */
+  border-radius: 30px;
+  transition: transform cubic-bezier(0.43, 0, 0, 0.99) 0.3s;
+}
+
+.pm10DustButton {
+  background-image: url("./pm10.svg");
+}
+.pm25DustButton {
+  background-image: url("pm25.svg");
+}
+.coButton {
+  background-image: url("co.svg");
+}
+.o3Button {
+  background-image: url("o3.svg");
+}

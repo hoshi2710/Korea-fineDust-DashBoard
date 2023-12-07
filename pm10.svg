@@ -1,0 +1,10 @@
+<!-- 미세먼지 아이콘 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="2.8" />
+  <circle cx="7" cy="9" r="1.8" />
+  <circle cx="17" cy="9" r="1.8" />
+  <circle cx="12" cy="15" r="1.8" />
+  <circle cx="6" cy="16" r="1.8" />
+  <circle cx="16" cy="16" r="1.8" />
+  <circle cx="11" cy="18" r="1.8" />
+</svg>
