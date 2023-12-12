@@ -120,9 +120,52 @@ const colorPulse = (time) => {
   // console.log("test");
 };
 
+class Search {
+  constructor() {
+    this.locationCategory = [
+      "서울",
+      "부산",
+      "대구",
+      "인천",
+      "광주",
+      "대전",
+      "울산",
+      "경기",
+      "강원",
+      "충북",
+      "충남",
+      "전북",
+      "전남",
+      "경북",
+      "경남",
+      "제주",
+      "세종",
+    ];
+  }
+  createAutoCompleteWordElement(text) {
+    const element = document.createElement("div");
+    element.textContent = text;
+    element.className = "autoCompleteWord";
+
+    const target = document.getElementsByClassName("searchAutoCompletion")[0];
+    target.appendChild(element);
+  }
+  generateAutoCompleteWord(input) {
+    if (input.length < 2) {
+      return;
+    }
+    let splitedText = input.split(" ");
+    let locationSearchResult = this.locationCategory.indexOf(splitedText[0]);
+    console.log(locationSearchResult);
+  }
+  loadInputLocation() {}
+}
+
 window.onload = () => {
   const currentLocation = "전북 임실읍";
   const fineDust = new FineDust(currentLocation.split(" ")[0], currentLocation.split(" ")[1]);
+  const searchManager = new Search();
+  const searchInput = document.querySelector(".search input");
   //   fineDust.changeLocation(currentLocation.split(" ")[0], currentLocation.split(" ")[1]);
   const dustTypeSelector = document.getElementsByClassName("dustTypeSelector")[0];
   let dustTypeButtons = {};
@@ -138,4 +181,10 @@ window.onload = () => {
       setDustType(idx, dustTypeSelector, fineDust.showResult(type));
     };
   });
+  searchInput.onfocus = (event) => {
+    searchManager.generateAutoCompleteWord(event.target.value);
+  };
+  searchInput.oninput = (event) => {
+    searchManager.generateAutoCompleteWord(event.target.value);
+  };
 };
