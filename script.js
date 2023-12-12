@@ -25,28 +25,6 @@ const setDustType = (idx, dustTypeSelector, nextClass) => {
     background.setAttribute("data-next-class", "");
   });
 };
-class Location {
-  constructor(){
-    this.getIp().then((ip)=>{
-      this.ip = ip;
-      this.getCurrentLocation(this.ip);
-    });
-  }
-  async getIp()
-  {
-    const fetchIp = await fetch("https://api64.ipify.org?format=json");
-    const body = await fetchIp.json()
-    const ip = body["ip"]
-    return ip;
-  }
-  async getCurrentLocation(ip)
-  {
-    const fetchInfo = await fetch("http://ip-api.com/json/"+ip);
-    const body = await fetchInfo.json();
-    console.log(body);
-  }
-}
-
 class FineDust {
   constructor(currentSido, currentStation) {
     this.params = {
@@ -185,7 +163,6 @@ class Search {
 
 window.onload = () => {
   const currentLocation = "전북 임실읍";
-  const locationManager = new Location();
   const fineDust = new FineDust(currentLocation.split(" ")[0], currentLocation.split(" ")[1]);
   const searchManager = new Search();
   const searchInput = document.querySelector(".search input");
