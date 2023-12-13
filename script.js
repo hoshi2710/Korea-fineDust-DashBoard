@@ -121,42 +121,46 @@ const colorPulse = (time) => {
 };
 
 class Search {
-  constructor() {
-    this.locationCategory = [
-      "서울",
-      "부산",
-      "대구",
-      "인천",
-      "광주",
-      "대전",
-      "울산",
-      "경기",
-      "강원",
-      "충북",
-      "충남",
-      "전북",
-      "전남",
-      "경북",
-      "경남",
-      "제주",
-      "세종",
-    ];
+  constructor() {}
+  async loadLocationNames() {
+    const locationNamesLoadResponse = new Response((await fetch("./locationNames.json")).body);
+    return await locationNamesLoadResponse.json();
   }
-  createAutoCompleteWordElement(text) {
-    const element = document.createElement("div");
-    element.textContent = text;
-    element.className = "autoCompleteWord";
 
+  createAutoCompleteWordElement(resultArray) {
+    let autoCompleteWordElements = [];
     const target = document.getElementsByClassName("searchAutoCompletion")[0];
-    target.appendChild(element);
+    target.innerHTML = null;
+    resultArray.forEach((text, index) => {
+      autoCompleteWordElements.push(document.createElement("div"));
+      autoCompleteWordElements[index].textContent = text;
+      autoCompleteWordElements[index].className = "autoCompleteWord";
+      target.appendChild(autoCompleteWordElements[index]);
+    });
   }
-  generateAutoCompleteWord(input) {
-    if (input.length < 2) {
-      return;
-    }
+  async generateAutoCompleteWord(input) {
+    const locationNames = await this.loadLocationNames();
+    const adminAreaNames = Object.keys(locationNames);
     let splitedText = input.split(" ");
-    let locationSearchResult = this.locationCategory.indexOf(splitedText[0]);
-    console.log(locationSearchResult);
+    let locationSearchResult = [];
+    console.log(adminAreaNames);
+    if (splitedText.length < 2) {
+      for (let i = 0; i < adminAreaNames.length; i += 1) {
+        if (adminAreaNames[i].indexOf(splitedText[0]) != -1) {
+          locationSearchResult.push(adminAreaNames[i]);
+        }
+      }
+    } else {
+      const adminArea = splitedText[0];
+      const subAdminAreas = locationNames[adminArea];
+      for (let i = 0; i < subAdminAreas.length; i += 1) {
+        if (subAdminAreas[i].indexOf(splitedText[1]) != -1) {
+          locationSearchResult.push(adminArea + " " + subAdminAreas[i]);
+        }
+      }
+    }
+
+    this.createAutoCompleteWordElement(locationSearchResult);
   }
   loadInputLocation() {}
 }
@@ -174,7 +178,7 @@ window.onload = () => {
   dustTypeButtons["co"] = document.getElementsByClassName("coButton")[0];
   dustTypeButtons["o3"] = document.getElementsByClassName("o3Button")[0];
 
-  const colorPulseInterval = setInterval(() => colorPulse(performance.now()), 1);
+  const colorPulseInterval = setInterval(() => colorPulse(performance.now()), 10);
 
   Object.keys(dustTypeButtons).forEach((type, idx) => {
     dustTypeButtons[type].onclick = () => {

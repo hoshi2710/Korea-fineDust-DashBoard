@@ -54,7 +54,7 @@ i {
   padding-top: 10px;
   text-align: center;
   overflow: hidden;
-  max-height: 100px;
+  max-height: 95px;
 }
 .autoCompleteWord {
   display: block;
