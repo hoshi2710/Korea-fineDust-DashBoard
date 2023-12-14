@@ -134,6 +134,7 @@ class Search {
 
   createAutoCompleteWordElement(resultArray) {
     const autoCompleteWordElements = [];
+    let splitedText = this.searchInputElement.value.split(" ");
     this.autoCompletionWordsArea.innerHTML = null;
     resultArray.forEach((text, index) => {
       autoCompleteWordElements.push(document.createElement("div"));
@@ -143,15 +144,26 @@ class Search {
         this.searchInputElement.value = event.target.textContent + " ";
         this.searchInputElement.focus();
         if (event.target.textContent.length > 2) {
-          let splitedText = event.target.textContent.split(" ");
-          this.fineDustManager.params["sidoName"] = splitedText[0];
-          this.fineDustManager.station = splitedText[1];
-          this.fineDustManager.fetchData();
-          this.searchInputElement.blur();
+          this.excuteSearching(splitedText[0], splitedText[1]);
         }
       };
+
+      const listeningReturnKey =
+        resultArray[0] === this.searchInputElement.value && this.searchInputElement.value.length > 2;
+      this.searchInputElement.onkeypress = listeningReturnKey
+        ? (event) => {
+            event.key === "Enter" ? this.excuteSearching(splitedText[0], splitedText[1]) : null;
+          }
+        : null;
+
       this.autoCompletionWordsArea.appendChild(autoCompleteWordElements[index]);
     });
+  }
+  excuteSearching(sidoName, stationName) {
+    this.fineDustManager.params["sidoName"] = sidoName;
+    this.fineDustManager.station = stationName;
+    this.fineDustManager.fetchData();
+    this.searchInputElement.blur();
   }
   async generateAutoCompleteWord(input) {
     const locationNames = await this.loadLocationNames();
