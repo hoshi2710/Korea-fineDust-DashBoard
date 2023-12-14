@@ -68,7 +68,7 @@ class FineDust {
     this.backgroundElement = document.getElementsByClassName("background")[0];
     this.dustTypeSelector = document.getElementsByClassName("dustTypeSelector")[0];
     this.fetchData();
-    // this.fetchLoop = setInterval(() => this.fetchData(), 3600000);
+    this.fetchLoop = setInterval(() => this.fetchData(), 3600000);
   }
   fetchData() {
     fetch(this.requestUrl)
@@ -76,25 +76,25 @@ class FineDust {
         return response.body;
       })
       .then(async (body) => {
-        console.log(body);
         let res = new Response(body);
-        res.json().then((result) => {
-          this.output === undefined ? this.fetchData() : undefined;
-          console.log(this.output);
-          this.output = result.response.body.items;
+        res
+          .json()
+          .then((result) => {
+            this.output === undefined ? this.fetchData() : undefined;
+            this.output = result.response.body.items;
 
-          Object.keys(this.output).forEach((idx) => {
-            if (this.output[idx].stationName === this.station) {
-              this.fetchedData = this.output[idx];
-            }
-          });
-          Object.keys(this.dustValues).forEach((key) => {
-            this.dustValues[key].value = this.fetchedData[key + "Value"];
-            this.dustValues[key].grade = this.fetchedData[key + "Grade"];
-          });
-          setDustType(0, this.dustTypeSelector, this.showResult("pm10"));
-        });
-        // .catch((e) => console.log(e));
+            Object.keys(this.output).forEach((idx) => {
+              if (this.output[idx].stationName === this.station) {
+                this.fetchedData = this.output[idx];
+              }
+            });
+            Object.keys(this.dustValues).forEach((key) => {
+              this.dustValues[key].value = this.fetchedData[key + "Value"];
+              this.dustValues[key].grade = this.fetchedData[key + "Grade"];
+            });
+            setDustType(0, this.dustTypeSelector, this.showResult("pm10"));
+          })
+          .catch((e) => console.log(e));
       });
   }
   showResult(type) {
@@ -104,10 +104,6 @@ class FineDust {
     this.dustValueElement.textContent = selectedTypeValues["value"];
     this.statusElement.textContent = this.statusPresetText[selectedTypeValues["grade"]];
     this.selectedDustTypeElement.textContent = this.dustTypeStringKorean[type];
-    // if (this.backgroundElement.className !== "background") {
-    //   this.backgroundElement.className = "background";
-    // }
-    // this.backgroundElement.classList.add("airQuality" + selectedTypeValues["grade"]);
     return "airQuality" + selectedTypeValues["grade"];
   }
 }
@@ -116,9 +112,7 @@ const colorPulse = (time) => {
   const backgroundElement = document.getElementsByClassName("background")[0];
   const adjustTimeValue = time % 128000;
   const pulseValue = ((Math.cos(((adjustTimeValue / 1000) * Math.PI) / 8) + 1) / 2) * (2 / 5) + 3 / 5;
-  // console.log(pulseValue);
   backgroundElement.style.setProperty("--color-pulse", pulseValue);
-  // console.log("test");
 };
 
 class Search {
@@ -196,7 +190,6 @@ window.onload = () => {
   const fineDust = new FineDust(currentLocation.split(" ")[0], currentLocation.split(" ")[1]);
   const searchManager = new Search(fineDust);
   const searchInput = document.querySelector(".search input");
-  //   fineDust.changeLocation(currentLocation.split(" ")[0], currentLocation.split(" ")[1]);
   const dustTypeSelector = document.getElementsByClassName("dustTypeSelector")[0];
   let dustTypeButtons = {};
   dustTypeButtons["pm10"] = document.getElementsByClassName("pm10DustButton")[0];
