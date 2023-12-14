@@ -66,6 +66,7 @@ class FineDust {
     this.dustValueElement = document.querySelector(".dustValue i");
     this.statusElement = document.getElementsByClassName("status")[0];
     this.backgroundElement = document.getElementsByClassName("background")[0];
+    this.dustTypeSelector = document.getElementsByClassName("dustTypeSelector")[0];
     this.fetchData();
     // this.fetchLoop = setInterval(() => this.fetchData(), 3600000);
   }
@@ -91,7 +92,7 @@ class FineDust {
             this.dustValues[key].value = this.fetchedData[key + "Value"];
             this.dustValues[key].grade = this.fetchedData[key + "Grade"];
           });
-          setDustType(null, null, this.showResult("pm10"));
+          setDustType(0, this.dustTypeSelector, this.showResult("pm10"));
         });
         // .catch((e) => console.log(e));
       });
@@ -121,29 +122,42 @@ const colorPulse = (time) => {
 };
 
 class Search {
-  constructor() {}
+  constructor(fineDustManager) {
+    this.fineDustManager = fineDustManager;
+    this.searchInputElement = document.querySelector(".searchOutline > input");
+    this.autoCompletionWordsArea = document.getElementsByClassName("searchAutoCompletion")[0];
+  }
   async loadLocationNames() {
     const locationNamesLoadResponse = new Response((await fetch("./locationNames.json")).body);
     return await locationNamesLoadResponse.json();
   }
 
   createAutoCompleteWordElement(resultArray) {
-    let autoCompleteWordElements = [];
-    const target = document.getElementsByClassName("searchAutoCompletion")[0];
-    target.innerHTML = null;
+    const autoCompleteWordElements = [];
+    this.autoCompletionWordsArea.innerHTML = null;
     resultArray.forEach((text, index) => {
       autoCompleteWordElements.push(document.createElement("div"));
       autoCompleteWordElements[index].textContent = text;
       autoCompleteWordElements[index].className = "autoCompleteWord";
-      target.appendChild(autoCompleteWordElements[index]);
+      autoCompleteWordElements[index].onclick = (event) => {
+        this.searchInputElement.value = event.target.textContent + " ";
+        this.searchInputElement.focus();
+        if (event.target.textContent.length > 2) {
+          let splitedText = event.target.textContent.split(" ");
+          this.fineDustManager.params["sidoName"] = splitedText[0];
+          this.fineDustManager.station = splitedText[1];
+          this.fineDustManager.fetchData();
+          this.searchInputElement.blur();
+        }
+      };
+      this.autoCompletionWordsArea.appendChild(autoCompleteWordElements[index]);
     });
   }
   async generateAutoCompleteWord(input) {
     const locationNames = await this.loadLocationNames();
     const adminAreaNames = Object.keys(locationNames);
     let splitedText = input.split(" ");
-    let locationSearchResult = [];
-    console.log(adminAreaNames);
+    const locationSearchResult = [];
     if (splitedText.length < 2) {
       for (let i = 0; i < adminAreaNames.length; i += 1) {
         if (adminAreaNames[i].indexOf(splitedText[0]) != -1) {
@@ -168,7 +182,7 @@ class Search {
 window.onload = () => {
   const currentLocation = "전북 임실읍";
   const fineDust = new FineDust(currentLocation.split(" ")[0], currentLocation.split(" ")[1]);
-  const searchManager = new Search();
+  const searchManager = new Search(fineDust);
   const searchInput = document.querySelector(".search input");
   //   fineDust.changeLocation(currentLocation.split(" ")[0], currentLocation.split(" ")[1]);
   const dustTypeSelector = document.getElementsByClassName("dustTypeSelector")[0];
