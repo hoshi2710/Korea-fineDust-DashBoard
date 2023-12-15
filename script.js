@@ -27,17 +27,24 @@ const setDustType = (idx, dustTypeSelector, nextClass) => {
 };
 const changeStatusText = (status) => {
   const statusTextElement = document.getElementsByClassName("status")[0];
-  statusTextElement.style.setProperty("--after-element-content", status);
+  
+  // if(statusTextElement.textContent === status){
+  //   return;
+  // }
+  statusTextElement.style.setProperty("--after-element-content", `'${status}'`);
+  statusTextElement.setAttribute("data-next-status",status);
   statusTextElement.addEventListener("transitionend", (event) => {
     if (!event.target.classList.contains("status")) {
       return;
     }
     if (event.target.style.getPropertyValue("--inner-contents-translateY") === "-300pt") {
-      event.target.textContent = status;
-      event.target.style.transition("0s");
+      const nextStatus = event.target.getAttribute("data-next-status");
+      event.target.innerHTML = `<span>${nextStatus}</span>`;
+      event.target.style.setProperty("--after-element-content", "' '");
+      event.target.style.setProperty("transition","0s");
       event.target.style.setProperty("--inner-contents-translateY", "0pt");
-      event.target.style.transition("0.2s");
-      event.target.style.setProperty("--after-element-content", "");
+      event.target.style.setProperty("transition","0.2s");
+      event.target.setAttribute("data-next-status","");
     }
   });
   statusTextElement.style.setProperty("--inner-contents-translateY", "-300pt");
@@ -60,6 +67,7 @@ class FineDust {
       o3: "오존",
     };
     this.fetchedData = null;
+    this.fetchProceed = true;
     this.station = currentStation;
     this.valueBlock = {
       value: -1,
@@ -85,10 +93,13 @@ class FineDust {
     this.statusElement = document.querySelector(".status span");
     this.backgroundElement = document.getElementsByClassName("background")[0];
     this.dustTypeSelector = document.getElementsByClassName("dustTypeSelector")[0];
-    this.fetchData();
-    this.fetchLoop = setInterval(() => this.fetchData(), 3600000);
+    this.fetchData()
+    this.fetchLoop = setInterval(() => {this.fetchProceed = true; this.fetchData();}, 3600000);
   }
   fetchData() {
+    if(!this.fetchProceed){
+      return;
+    }
     fetch(this.requestUrl)
       .then((response) => {
         return response.body;
@@ -110,18 +121,20 @@ class FineDust {
               this.dustValues[key].value = this.fetchedData[key + "Value"];
               this.dustValues[key].grade = this.fetchedData[key + "Grade"];
             });
+            console.log(this.fetchedData)
             setDustType(0, this.dustTypeSelector, this.showResult("pm10"));
           })
           .catch((e) => console.log(e));
       });
+      this.fetchProceed = false;
   }
   showResult(type) {
     const dustType = Object.keys(this.dustValues);
     const selectedTypeValues = this.dustValues[type];
     this.locationElement.textContent = this.station;
     this.dustValueElement.textContent = selectedTypeValues["value"];
-    // changeStatusText(this.statusPresetText[selectedTypeValues["grade"]]);
-    this.statusElement.textContent = this.statusPresetText[selectedTypeValues["grade"]];
+    changeStatusText(this.statusPresetText[selectedTypeValues["grade"]]);
+    // this.statusElement.textContent = this.statusPresetText[selectedTypeValues["grade"]];
     this.selectedDustTypeElement.textContent = this.dustTypeStringKorean[type];
     return "airQuality" + selectedTypeValues["grade"];
   }
@@ -147,6 +160,7 @@ class Search {
 
   createAutoCompleteWordElement(resultArray) {
     const autoCompleteWordElements = [];
+    
     let splitedText = this.searchInputElement.value.split(" ");
     this.autoCompletionWordsArea.innerHTML = null;
     resultArray.forEach((text, index) => {
@@ -155,6 +169,7 @@ class Search {
       autoCompleteWordElements[index].className = "autoCompleteWord";
       autoCompleteWordElements[index].onclick = (event) => {
         this.searchInputElement.value = event.target.textContent + " ";
+        splitedText = event.target.textContent.split(" ");
         this.searchInputElement.focus();
         if (event.target.textContent.length > 2) {
           this.excuteSearching(splitedText[0], splitedText[1]);
@@ -175,6 +190,8 @@ class Search {
   excuteSearching(sidoName, stationName) {
     this.fineDustManager.params["sidoName"] = sidoName;
     this.fineDustManager.station = stationName;
+    console.log(sidoName, stationName)
+    this.fineDustManager.fetchProceed = true;
     this.fineDustManager.fetchData();
     this.searchInputElement.blur();
   }

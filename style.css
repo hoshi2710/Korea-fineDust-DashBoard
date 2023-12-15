@@ -148,8 +148,8 @@ i {
   font-size: 250pt;
   overflow: hidden;
   max-height: 255pt;
-  --inner-contents-translateY: -300pt;
-  --after-element-content: "보통";
+  --inner-contents-translateY: 0pt;
+  --after-element-content: " ";
 }
 .contents .status span {
   display: block;
@@ -158,7 +158,7 @@ i {
 }
 .contents .status::after {
   display: block;
-  content: var(--after-element-content);
+  content: var(--after-element-content) !important;
   transition: 0.2s;
   transform: translateY(var(--inner-contents-translateY));
 }
