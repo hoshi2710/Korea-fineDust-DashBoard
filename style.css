@@ -68,7 +68,7 @@ i {
   transition: opacity 0.2s;
 }
 .autoCompleteWord:hover {
-	opacity:0.8
+  opacity: 0.8;
 }
 .background::before {
   position: absolute;
@@ -106,7 +106,6 @@ i {
   border-radius: 30px;
   background-color: transparent;
   border: 3px solid #000;
-  /* padding-left: 50px; */
 }
 .search > .searchOutline > * {
   display: inline-block;
@@ -147,6 +146,21 @@ i {
 .contents .status {
   font-weight: 400;
   font-size: 250pt;
+  overflow: hidden;
+  max-height: 255pt;
+  --inner-contents-translateY: -300pt;
+  --after-element-content: "보통";
+}
+.contents .status span {
+  display: block;
+  transition: 0.2s;
+  transform: translateY(var(--inner-contents-translateY));
+}
+.contents .status::after {
+  display: block;
+  content: var(--after-element-content);
+  transition: 0.2s;
+  transform: translateY(var(--inner-contents-translateY));
 }
 .location {
   margin-bottom: 10px;

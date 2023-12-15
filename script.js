@@ -25,6 +25,24 @@ const setDustType = (idx, dustTypeSelector, nextClass) => {
     background.setAttribute("data-next-class", "");
   });
 };
+const changeStatusText = (status) => {
+  const statusTextElement = document.getElementsByClassName("status")[0];
+  statusTextElement.style.setProperty("--after-element-content", status);
+  statusTextElement.addEventListener("transitionend", (event) => {
+    if (!event.target.classList.contains("status")) {
+      return;
+    }
+    if (event.target.style.getPropertyValue("--inner-contents-translateY") === "-300pt") {
+      event.target.textContent = status;
+      event.target.style.transition("0s");
+      event.target.style.setProperty("--inner-contents-translateY", "0pt");
+      event.target.style.transition("0.2s");
+      event.target.style.setProperty("--after-element-content", "");
+    }
+  });
+  statusTextElement.style.setProperty("--inner-contents-translateY", "-300pt");
+};
+
 class FineDust {
   constructor(currentSido, currentStation) {
     this.params = {
@@ -64,7 +82,7 @@ class FineDust {
     this.locationElement = document.getElementsByClassName("locationText")[0];
     this.selectedDustTypeElement = document.querySelector(".dustValue .selectedDustType");
     this.dustValueElement = document.querySelector(".dustValue i");
-    this.statusElement = document.getElementsByClassName("status")[0];
+    this.statusElement = document.querySelector(".status span");
     this.backgroundElement = document.getElementsByClassName("background")[0];
     this.dustTypeSelector = document.getElementsByClassName("dustTypeSelector")[0];
     this.fetchData();
@@ -102,6 +120,7 @@ class FineDust {
     const selectedTypeValues = this.dustValues[type];
     this.locationElement.textContent = this.station;
     this.dustValueElement.textContent = selectedTypeValues["value"];
+    // changeStatusText(this.statusPresetText[selectedTypeValues["grade"]]);
     this.statusElement.textContent = this.statusPresetText[selectedTypeValues["grade"]];
     this.selectedDustTypeElement.textContent = this.dustTypeStringKorean[type];
     return "airQuality" + selectedTypeValues["grade"];
