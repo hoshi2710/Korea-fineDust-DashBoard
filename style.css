@@ -148,19 +148,28 @@ i {
   font-size: 250pt;
   overflow: hidden;
   max-height: 255pt;
-  --inner-contents-translateY: 0pt;
+  --inner-contents-translateY: -300pt;
   --after-element-content: " ";
+  --before-element-content: " ";
 }
 .contents .status span {
   display: block;
   transition: 0.2s;
   transform: translateY(var(--inner-contents-translateY));
 }
-.contents .status::after {
+.contents .status::after, .contents .status::before {
   display: block;
-  content: var(--after-element-content) !important;
   transition: 0.2s;
+  height: 300pt;
   transform: translateY(var(--inner-contents-translateY));
+}
+.contents .status::after
+{
+  content: var(--after-element-content) !important;
+}
+.contents .status::before
+{
+  content: var(--before-element-content) !important;
 }
 .location {
   margin-bottom: 10px;

@@ -3,6 +3,7 @@ const setDustType = (idx, dustTypeSelector, nextClass) => {
   if (idx !== null && dustTypeSelector !== null) {
     dustTypeSelector.style.transform = `translate(0px,${50 * idx}px)`;
   }
+
   const nextAirQualityNo = nextClass.replace("airQuality", "");
 
   background.style.setProperty("--before-background", `var(--airQuality${nextAirQualityNo}-Gradient)`);
@@ -25,29 +26,28 @@ const setDustType = (idx, dustTypeSelector, nextClass) => {
     background.setAttribute("data-next-class", "");
   });
 };
-const changeStatusText = (status) => {
+const changeStatusText = (status,direction) => {
   const statusTextElement = document.getElementsByClassName("status")[0];
-  
-  // if(statusTextElement.textContent === status){
-  //   return;
-  // }
-  statusTextElement.style.setProperty("--after-element-content", `'${status}'`);
+  const beforeAfterSwitch = direction ? "after" : "before";
+  console.log(`--${beforeAfterSwitch}-element-content`);
+  statusTextElement.style.setProperty(`--${beforeAfterSwitch}-element-content`, `'${status}'`);
   statusTextElement.setAttribute("data-next-status",status);
   statusTextElement.addEventListener("transitionend", (event) => {
     if (!event.target.classList.contains("status")) {
       return;
     }
-    if (event.target.style.getPropertyValue("--inner-contents-translateY") === "-300pt") {
+    if (event.target.style.getPropertyValue("--inner-contents-translateY") === -300 + (direction ? -300 : 300) + "pt") {
       const nextStatus = event.target.getAttribute("data-next-status");
       event.target.innerHTML = `<span>${nextStatus}</span>`;
-      event.target.style.setProperty("--after-element-content", "' '");
+      console.log(event.target.style.getPropertyValue("--before-element-content"));
+      event.target.style.setProperty(`--${beforeAfterSwitch}-element-content`, "' '");
       event.target.style.setProperty("transition","0s");
-      event.target.style.setProperty("--inner-contents-translateY", "0pt");
+      event.target.style.setProperty("--inner-contents-translateY", "-300pt");
       event.target.style.setProperty("transition","0.2s");
       event.target.setAttribute("data-next-status","");
     }
   });
-  statusTextElement.style.setProperty("--inner-contents-translateY", "-300pt");
+  statusTextElement.style.setProperty("--inner-contents-translateY", -300 + (direction ? -300 : 300) + "pt");
 };
 
 class FineDust {
@@ -78,8 +78,10 @@ class FineDust {
     this.dustValues["pm25"] = JSON.parse(JSON.stringify(this.valueBlock));
     this.dustValues["co"] = JSON.parse(JSON.stringify(this.valueBlock));
     this.dustValues["o3"] = JSON.parse(JSON.stringify(this.valueBlock));
+    this.dustType = Object.keys(this.dustValues);
 
-    this.fetchQuery = new URLSearchParams(this.params).toString().replaceAll("%25", "%");
+    this.fetchQuery = (new URLSearchParams(this.params)).toString().replace(/%25/g, "%");
+    console.log(this.fetchQuery);
     this.requestUrl = `http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?${this.fetchQuery}`;
     this.statusPresetText = {
       1: "좋음",
@@ -93,6 +95,8 @@ class FineDust {
     this.statusElement = document.querySelector(".status span");
     this.backgroundElement = document.getElementsByClassName("background")[0];
     this.dustTypeSelector = document.getElementsByClassName("dustTypeSelector")[0];
+    this.mainDustType = "pm10";
+    this.currentSelectedType = -1;
     this.fetchData()
     this.fetchLoop = setInterval(() => {this.fetchProceed = true; this.fetchData();}, 3600000);
   }
@@ -121,21 +125,23 @@ class FineDust {
               this.dustValues[key].value = this.fetchedData[key + "Value"];
               this.dustValues[key].grade = this.fetchedData[key + "Grade"];
             });
-            console.log(this.fetchedData)
-            setDustType(0, this.dustTypeSelector, this.showResult("pm10"));
+            setDustType(0, this.dustTypeSelector, this.showResult(this.mainDustType,true));
           })
-          .catch((e) => console.log(e));
+          // .catch((e) => console.log(e));
       });
       this.fetchProceed = false;
   }
-  showResult(type) {
-    const dustType = Object.keys(this.dustValues);
+  showResult(type, refresh) {
     const selectedTypeValues = this.dustValues[type];
     this.locationElement.textContent = this.station;
     this.dustValueElement.textContent = selectedTypeValues["value"];
-    changeStatusText(this.statusPresetText[selectedTypeValues["grade"]]);
+    console.log(this.dustType.indexOf(type), this.currentSelectedType)
+    changeStatusText(this.statusPresetText[selectedTypeValues["grade"]],this.dustType.indexOf(type) >= this.currentSelectedType);
+    this.currentSelectedType = this.dustType.indexOf(type);
+    this.statusPresetText[selectedTypeValues["grade"]]
     // this.statusElement.textContent = this.statusPresetText[selectedTypeValues["grade"]];
     this.selectedDustTypeElement.textContent = this.dustTypeStringKorean[type];
+    console.log("airQuality" + selectedTypeValues["grade"]);
     return "airQuality" + selectedTypeValues["grade"];
   }
 }
@@ -237,7 +243,7 @@ window.onload = () => {
 
   Object.keys(dustTypeButtons).forEach((type, idx) => {
     dustTypeButtons[type].onclick = () => {
-      setDustType(idx, dustTypeSelector, fineDust.showResult(type));
+      setDustType(idx, dustTypeSelector, fineDust.showResult(type, false));
     };
   });
   searchInput.onfocus = (event) => {
