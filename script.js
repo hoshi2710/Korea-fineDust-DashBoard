@@ -79,7 +79,7 @@ class FineDust {
     this.dustType = Object.keys(this.dustValues);
 
     this.fetchQuery = (new URLSearchParams(this.params)).toString().replace(/%25/g, "%");
-    this.requestUrl = `http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?${this.fetchQuery}`;
+    this.requestUrl = `https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?${this.fetchQuery}`;
     this.statusPresetText = {
       1: "좋음",
       2: "보통",
